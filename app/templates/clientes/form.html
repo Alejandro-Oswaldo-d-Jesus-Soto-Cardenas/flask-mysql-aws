@@ -1,51 +1,111 @@
 
-<!-- CAMPO: NOMBRE -->
-<div class="form-group">
-    <label for="nombre">Nombre completo *</label>
+{% extends "base.html" %}
 
-    <input
-        type="text"
-        id="nombre"
-        name="nombre"
-        value="{{ form_data.nombre }}"
-        required
-        minlength="2"
-        maxlength="100"
-        pattern=".*\S.*"
-        title="Ingresa un nombre de entre 2 y 100 caracteres."
-        autocomplete="name"
-    >
-</div>
+{% block title %}{{ 'Editar cliente' if cliente else 'Nuevo cliente' }} | NovaCRM{% endblock %}
 
-<!-- CAMPO: CORREO ELECTRÓNICO -->
-<div class="form-group">
-    <label for="correo">Correo electrónico *</label>
+{% block content %}
+<section class="page-heading">
+    <div>
+        <h2>{{ 'Editar cliente' if cliente else 'Registrar cliente' }}</h2>
+        <p>
+            {{ 'Actualiza la información del cliente.' if cliente
+               else 'Completa los datos para registrar un nuevo cliente.' }}
+        </p>
+    </div>
 
-    <input
-        type="email"
-        id="correo"
-        name="correo"
-        value="{{ form_data.correo }}"
-        required
-        maxlength="120"
-        autocomplete="email"
-        title="Ingresa un correo válido, por ejemplo usuario@dominio.com."
-    >
-</div>
+    <a href="{{ url_for('clientes.index') }}" class="button button-secondary">
+        Volver al listado
+    </a>
+</section>
 
-<!-- CAMPO: TELÉFONO OPCIONAL -->
-<div class="form-group">
-    <label for="telefono">Teléfono (opcional)</label>
+<section class="panel form-panel">
+    <div class="panel-header">
+        <div>
+            <h3>Información del cliente</h3>
+            <p>Los campos marcados con * son obligatorios.</p>
+        </div>
+    </div>
 
-    <input
-        type="tel"
-        id="telefono"
-        name="telefono"
-        value="{{ form_data.telefono }}"
-        maxlength="20"
-        pattern="[0-9+() -]{7,20}"
-        inputmode="tel"
-        autocomplete="tel"
-        title="Ingresa entre 7 y 15 dígitos. Puedes usar +, paréntesis, espacios o guiones."
-    >
-</div>
+    <div class="form-body">
+        <form method="POST"
+              action="{{ url_for('clientes.editar', cliente_id=cliente.id) if cliente else url_for('clientes.nuevo') }}">
+            <div class="form-grid">
+                <div class="form-field full-width">
+                    <label for="nombre">
+                        Nombre completo <span class="required">*</span>
+                    </label>
+
+                    <input class="form-control"
+                           id="nombre"
+                           name="nombre"
+                           type="text"
+                           minlength="2"
+                           maxlength="100"
+                           autocomplete="name"
+                           pattern=".*\S.*"
+                           title="Ingresa un nombre de entre 2 y 100 caracteres."
+                           value="{{ form_data.nombre }}"
+                           placeholder="Ej. María López"
+                           required>
+
+                    <span class="form-help">
+                        Entre 2 y 100 caracteres.
+                    </span>
+                </div>
+
+                <div class="form-field full-width">
+                    <label for="correo">
+                        Correo electrónico <span class="required">*</span>
+                    </label>
+
+                    <input class="form-control"
+                           id="correo"
+                           name="correo"
+                           type="email"
+                           maxlength="120"
+                           autocomplete="email"
+                           title="Ingresa un correo electrónico válido."
+                           value="{{ form_data.correo }}"
+                           placeholder="maria@ejemplo.com"
+                           required>
+
+                    <span class="form-help">
+                        Debe ser válido y no estar registrado por otro cliente.
+                    </span>
+                </div>
+
+                <div class="form-field full-width">
+                    <label for="telefono">Teléfono (opcional)</label>
+
+                    <input class="form-control"
+                           id="telefono"
+                           name="telefono"
+                           type="tel"
+                           maxlength="20"
+                           pattern="[0-9+() -]{7,20}"
+                           inputmode="tel"
+                           autocomplete="tel"
+                           title="Ingresa entre 7 y 15 dígitos, usando números y separadores permitidos."
+                           value="{{ form_data.telefono }}"
+                           placeholder="Ej. +51 999 999 999">
+
+                    <span class="form-help">
+                        Opcional. Si lo ingresas, debe contener entre 7 y 15 dígitos.
+                    </span>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button class="button button-primary" type="submit">
+                    {{ 'Guardar cambios' if cliente else 'Registrar cliente' }}
+                </button>
+
+                <a class="button button-secondary"
+                   href="{{ url_for('clientes.index') }}">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}
