@@ -1,38 +1,106 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Gestión de Clientes{% endblock %}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f5f7fb">
+
+    <title>{% block title %}Clientes | NovaCRM{% endblock %}</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-<body class="min-h-screen bg-slate-100 text-slate-800">
-    <header class="bg-blue-900 text-white shadow">
-        <div class="mx-auto max-w-6xl px-6 py-5">
-            <h1 class="text-2xl font-bold">Gestión de Clientes</h1>
-            <p class="text-sm text-blue-200">Sistema web Flask + MySQL</p>
-        </div>
-    </header>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <a href="{{ url_for('clientes.index') }}" class="brand">
+                <span class="brand-icon">N</span>
+                <span>
+                    <strong>NovaCRM</strong>
+                    <small>GESTIÓN EMPRESARIAL</small>
+                </span>
+            </a>
 
-    <main class="mx-auto max-w-6xl px-6 py-8">
-        {% with mensajes = get_flashed_messages(with_categories=true) %}
-            {% for categoria, mensaje in mensajes %}
-                <div class="mb-4 rounded-lg p-4
-                    {% if categoria == 'success' %}
-                        bg-green-100 text-green-800
-                    {% else %}
-                        bg-red-100 text-red-800
-                    {% endif %}">
-                    {{ mensaje }}
+            <p class="nav-label">MENÚ PRINCIPAL</p>
+
+            <a class="nav-link active"
+               href="{{ url_for('clientes.index') }}">
+                <span>▦</span> Panel de clientes
+            </a>
+
+            <a class="nav-link"
+               href="{{ url_for('clientes.nuevo') }}">
+                <span>＋</span> Nuevo cliente
+            </a>
+
+            <div class="sidebar-bottom">
+                <span class="status-dot"></span>
+                <span>Aplicación operativa</span>
+            </div>
+        </aside>
+
+        <div class="main-area">
+            <header class="topbar">
+                <div>
+                    <span class="eyebrow">SISTEMA DE ADMINISTRACIÓN</span>
+                    <h1>Gestión de clientes</h1>
                 </div>
-            {% endfor %}
-        {% endwith %}
 
-        {% block content %}{% endblock %}
-    </main>
+                <div class="user-chip">
+                    <span class="avatar">AD</span>
+                    <span>
+                        <strong>Administrador</strong>
+                        <small>Panel de control</small>
+                    </span>
+                </div>
+            </header>
 
-    <footer class="py-6 text-center text-sm text-slate-500">
-        Aplicación modular desarrollada con Flask y MySQL
-    </footer>
+            <main class="content">
+                {% with mensajes = get_flashed_messages(with_categories=true) %}
+                    {% for categoria, mensaje in mensajes %}
+                        <div class="alert alert-{{ categoria }}"
+                             role="status">
+                            <span>{{ "✓" if categoria == "success" else "!" }}</span>
+                            <p>{{ mensaje }}</p>
+                            <button type="button"
+                                    class="alert-close"
+                                    aria-label="Cerrar mensaje"
+                                    onclick="this.parentElement.remove()">
+                                ×
+                            </button>
+                        </div>
+                    {% endfor %}
+                {% endwith %}
+
+                {% block content %}{% endblock %}
+            </main>
+
+            <footer class="footer">
+                NovaCRM · Flask + MySQL · Aplicación modular
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll(".alert").forEach((alerta) => {
+            setTimeout(() => {
+                if (alerta.isConnected) {
+                    alerta.classList.add("alert-hide");
+                    setTimeout(() => alerta.remove(), 300);
+                }
+            }, 5000);
+        });
+
+        document.querySelectorAll("[data-confirm]").forEach((formulario) => {
+            formulario.addEventListener("submit", (evento) => {
+                const mensaje = formulario.dataset.confirm;
+
+                if (!confirm(mensaje)) {
+                    evento.preventDefault();
+                }
+            });
+        });
+    </script>
 </body>
 </html>

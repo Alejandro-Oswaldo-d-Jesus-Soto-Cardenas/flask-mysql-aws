@@ -1,61 +1,202 @@
+
 {% extends "base.html" %}
 
-{% block title %}Clientes | Gestión de Clientes{% endblock %}
+{% block title %}Panel de clientes | NovaCRM{% endblock %}
 
 {% block content %}
-<div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+<section class="page-heading">
     <div>
-        <h2 class="text-2xl font-bold">Directorio de clientes</h2>
-        <p class="mt-1 text-slate-500">Administra los registros del sistema.</p>
+        <h2>Panel de clientes</h2>
+        <p>Consulta, busca y administra los clientes registrados.</p>
     </div>
-    <a href="{{ url_for('clientes.nuevo') }}"
-       class="rounded-lg bg-blue-700 px-5 py-3 font-semibold text-white hover:bg-blue-800">
-        + Nuevo cliente
-    </a>
-</div>
 
-<div class="overflow-x-auto rounded-xl bg-white shadow">
-    <table class="w-full text-left text-sm">
-        <thead class="bg-slate-200 text-slate-700">
-            <tr>
-                <th class="p-4">ID</th>
-                <th class="p-4">Nombre</th>
-                <th class="p-4">Correo</th>
-                <th class="p-4">Teléfono</th>
-                <th class="p-4">Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for cliente in clientes %}
-            <tr class="border-t hover:bg-slate-50">
-                <td class="p-4">{{ cliente.id }}</td>
-                <td class="p-4 font-medium">{{ cliente.nombre }}</td>
-                <td class="p-4">{{ cliente.correo }}</td>
-                <td class="p-4">{{ cliente.telefono or '—' }}</td>
-                <td class="p-4">
-                    <div class="flex flex-wrap gap-3">
-                        <a class="font-semibold text-blue-700"
-                           href="{{ url_for('clientes.editar', cliente_id=cliente.id) }}">
-                            Editar
-                        </a>
-                        <form method="POST"
-                              action="{{ url_for('clientes.eliminar', cliente_id=cliente.id) }}"
-                              onsubmit="return confirm('¿Eliminar este cliente?')">
-                            <button class="font-semibold text-red-600" type="submit">
-                                Eliminar
-                            </button>
-                        </form>
-                    </div>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="5" class="p-8 text-center text-slate-500">
-                    No hay clientes registrados. Crea el primero.
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-</div>
+    <a href="{{ url_for('clientes.nuevo') }}"
+       class="button button-primary">
+        <span>＋</span> Nuevo cliente
+    </a>
+</section>
+
+<section class="stats-grid">
+    <article class="stat-card">
+        <div class="stat-top">
+            Total de clientes registrados
+            <span class="stat-icon">♙</span>
+        </div>
+        <div class="stat-value">{{ total_clientes }}</div>
+        <div class="stat-note">Registros almacenados en MySQL</div>
+    </article>
+
+    <article class="stat-card">
+        <div class="stat-top">
+            Resultados encontrados
+            <span class="stat-icon">⌕</span>
+        </div>
+        <div class="stat-value">{{ clientes.total }}</div>
+        <div class="stat-note">
+            {% if busqueda %}
+                Coincidencias para tu búsqueda
+            {% else %}
+                Clientes según el filtro actual
+            {% endif %}
+        </div>
+    </article>
+
+    <article class="stat-card">
+        <div class="stat-top">
+            Página actual
+            <span class="stat-icon">▤</span>
+        </div>
+        <div class="stat-value">
+            {{ clientes.page }}
+            <span style="color:#9aa7b9;font-size:17px;font-weight:500">
+                / {{ clientes.pages or 1 }}
+            </span>
+        </div>
+        <div class="stat-note">Máximo 10 registros por página</div>
+    </article>
+</section>
+
+<section class="panel">
+    <div class="panel-header">
+        <div>
+            <h3>Directorio de clientes</h3>
+            <p>Información de contacto y acciones disponibles.</p>
+        </div>
+
+        <form class="search-form" method="GET"
+              action="{{ url_for('clientes.index') }}">
+            <input class="search-input"
+                   type="search"
+                   name="q"
+                   maxlength="120"
+                   value="{{ busqueda }}"
+                   placeholder="Buscar nombre, correo o teléfono..."
+                   aria-label="Buscar clientes">
+
+            <button class="button button-primary" type="submit">
+                Buscar
+            </button>
+
+            {% if busqueda %}
+                <a class="button button-secondary"
+                   href="{{ url_for('clientes.index') }}">
+                    Limpiar
+                </a>
+            {% endif %}
+        </form>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Cliente</th>
+                    <th>Correo electrónico</th>
+                    <th>Teléfono</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for cliente in clientes.items %}
+                    <tr>
+                        <td>
+                            <span class="id-badge">
+                                #{{ cliente.id }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <div class="customer-name">
+                                <span class="customer-avatar">
+                                    {{ cliente.nombre[:1]|upper }}
+                                </span>
+                                {{ cliente.nombre }}
+                            </div>
+                        </td>
+
+                        <td>{{ cliente.correo }}</td>
+                        <td>{{ cliente.telefono or 'No registrado' }}</td>
+
+                        <td>
+                            <div class="actions">
+                                <a class="action-link"
+                                   href="{{ url_for('clientes.editar', cliente_id=cliente.id) }}">
+                                    Editar
+                                </a>
+
+                                <form class="inline-form"
+                                      method="POST"
+                                      action="{{ url_for('clientes.eliminar', cliente_id=cliente.id) }}"
+                                      data-confirm="¿Seguro que deseas eliminar este cliente?">
+                                    <button class="button button-danger"
+                                            type="submit">
+                                        Eliminar
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <strong>No se encontraron clientes</strong>
+                                <p>
+                                    {% if busqueda %}
+                                        Prueba con otro nombre, correo o teléfono.
+                                    {% else %}
+                                        Registra el primer cliente para comenzar.
+                                    {% endif %}
+                                </p>
+
+                                {% if not busqueda %}
+                                    <a class="button button-primary"
+                                       href="{{ url_for('clientes.nuevo') }}">
+                                        Crear primer cliente
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="pagination">
+        <div class="pagination-info">
+            {% if clientes.total %}
+                Mostrando {{ clientes.first }}–{{ clientes.last }}
+                de {{ clientes.total }} resultados
+            {% else %}
+                0 resultados
+            {% endif %}
+        </div>
+
+        <nav class="pagination-links" aria-label="Paginación">
+            <a class="page-link {{ 'disabled' if not clientes.has_prev else '' }}"
+               href="{{ url_for('clientes.index', page=clientes.prev_num, q=busqueda) if clientes.has_prev else '#' }}">
+                ‹
+            </a>
+
+            {% for numero in clientes.iter_pages() %}
+                {% if numero %}
+                    <a class="page-link {{ 'current' if numero == clientes.page else '' }}"
+                       href="{{ url_for('clientes.index', page=numero, q=busqueda) }}">
+                        {{ numero }}
+                    </a>
+                {% else %}
+                    <span class="page-link disabled">…</span>
+                {% endif %}
+            {% endfor %}
+
+            <a class="page-link {{ 'disabled' if not clientes.has_next else '' }}"
+               href="{{ url_for('clientes.index', page=clientes.next_num, q=busqueda) if clientes.has_next else '#' }}">
+                ›
+            </a>
+        </nav>
+    </div>
+</section>
 {% endblock %}

@@ -1,50 +1,110 @@
+
 {% extends "base.html" %}
 
 {% block title %}
-    {{ 'Editar cliente' if cliente else 'Nuevo cliente' }}
+    {{ 'Editar cliente' if cliente else 'Nuevo cliente' }} | NovaCRM
 {% endblock %}
 
 {% block content %}
-<div class="mx-auto max-w-2xl rounded-xl bg-white p-8 shadow">
-    <h2 class="mb-6 text-2xl font-bold">
-        {{ 'Editar cliente' if cliente else 'Registrar cliente' }}
-    </h2>
+<section class="page-heading">
+    <div>
+        <h2>{{ 'Editar cliente' if cliente else 'Registrar cliente' }}</h2>
+        <p>
+            {{ 'Actualiza la información del cliente.' if cliente
+               else 'Completa los datos para registrar un nuevo cliente.' }}
+        </p>
+    </div>
 
-    <form method="POST" class="space-y-5">
+    <a href="{{ url_for('clientes.index') }}"
+       class="button button-secondary">
+        ← Volver al listado
+    </a>
+</section>
+
+<section class="panel form-panel">
+    <div class="panel-header">
         <div>
-            <label for="nombre" class="mb-2 block font-medium">Nombre completo *</label>
-            <input id="nombre" name="nombre" required maxlength="100"
-                   value="{{ request.form.get('nombre', cliente.nombre if cliente else '') }}"
-                   class="w-full rounded-lg border border-slate-300 px-4 py-3"
-                   placeholder="Ej. María López">
+            <h3>Información del cliente</h3>
+            <p>Los campos marcados con * son obligatorios.</p>
         </div>
+    </div>
 
-        <div>
-            <label for="correo" class="mb-2 block font-medium">Correo electrónico *</label>
-            <input id="correo" name="correo" type="email" required maxlength="120"
-                   value="{{ request.form.get('correo', cliente.correo if cliente else '') }}"
-                   class="w-full rounded-lg border border-slate-300 px-4 py-3"
-                   placeholder="maria@ejemplo.com">
-        </div>
+    <div class="form-body">
+        <form method="POST">
+            <div class="form-grid">
+                <div class="form-field full-width">
+                    <label for="nombre">
+                        Nombre completo <span class="required">*</span>
+                    </label>
 
-        <div>
-            <label for="telefono" class="mb-2 block font-medium">Teléfono</label>
-            <input id="telefono" name="telefono" maxlength="20"
-                   value="{{ request.form.get('telefono', cliente.telefono if cliente else '') }}"
-                   class="w-full rounded-lg border border-slate-300 px-4 py-3"
-                   placeholder="999 999 999">
-        </div>
+                    <input class="form-control"
+                           id="nombre"
+                           name="nombre"
+                           type="text"
+                           minlength="2"
+                           maxlength="100"
+                           autocomplete="name"
+                           pattern=".*\S.*"
+                           title="Ingresa al menos 2 caracteres."
+                           value="{{ request.form.get('nombre', cliente.nombre if cliente else '') }}"
+                           placeholder="Ej. María López"
+                           required>
+                    <span class="form-help">
+                        Entre 2 y 100 caracteres.
+                    </span>
+                </div>
 
-        <div class="flex flex-wrap gap-3 pt-2">
-            <button type="submit"
-                    class="rounded-lg bg-blue-700 px-5 py-3 font-semibold text-white hover:bg-blue-800">
-                Guardar cliente
-            </button>
-            <a href="{{ url_for('clientes.index') }}"
-               class="rounded-lg bg-slate-200 px-5 py-3 font-semibold hover:bg-slate-300">
-                Cancelar
-            </a>
-        </div>
-    </form>
-</div>
+                <div class="form-field full-width">
+                    <label for="correo">
+                        Correo electrónico <span class="required">*</span>
+                    </label>
+
+                    <input class="form-control"
+                           id="correo"
+                           name="correo"
+                           type="email"
+                           maxlength="120"
+                           autocomplete="email"
+                           value="{{ request.form.get('correo', cliente.correo if cliente else '') }}"
+                           placeholder="maria@ejemplo.com"
+                           required>
+                    <span class="form-help">
+                        Debe ser un correo válido y no estar registrado por otro cliente.
+                    </span>
+                </div>
+
+                <div class="form-field full-width">
+                    <label for="telefono">Teléfono</label>
+
+                    <input class="form-control"
+                           id="telefono"
+                           name="telefono"
+                           type="tel"
+                           minlength="7"
+                           maxlength="20"
+                           pattern="[0-9+() -]{7,20}"
+                           title="Usa números, espacios, +, paréntesis o guiones."
+                           autocomplete="tel"
+                           value="{{ request.form.get('telefono', cliente.telefono if cliente else '') }}"
+                           placeholder="Ej. +51 999 999 999">
+
+                    <span class="form-help">
+                        Opcional. Puedes incluir el código de país.
+                    </span>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button class="button button-primary" type="submit">
+                    {{ 'Guardar cambios' if cliente else 'Registrar cliente' }}
+                </button>
+
+                <a class="button button-secondary"
+                   href="{{ url_for('clientes.index') }}">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</section>
 {% endblock %}
