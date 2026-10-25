@@ -11,6 +11,7 @@ def listar_clientes(busqueda="", page=1, per_page=10):
 
     if busqueda:
         patron = f"%{busqueda}%"
+
         consulta = consulta.where(
             or_(
                 Cliente.nombre.ilike(patron),
@@ -51,6 +52,7 @@ def crear_cliente(nombre, correo, telefono):
     try:
         db.session.commit()
         return True, "Cliente registrado correctamente."
+
     except IntegrityError:
         db.session.rollback()
         return False, "Ese correo ya está registrado."
@@ -64,6 +66,7 @@ def actualizar_cliente(cliente, nombre, correo, telefono):
     try:
         db.session.commit()
         return True, "Cliente actualizado correctamente."
+
     except IntegrityError:
         db.session.rollback()
         return False, "Ese correo ya pertenece a otro cliente."
