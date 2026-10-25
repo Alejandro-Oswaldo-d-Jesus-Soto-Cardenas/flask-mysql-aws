@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {{ 'Editar cliente' if cliente else 'Nuevo cliente' }}
+{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-2xl rounded-xl bg-white p-8 shadow">
+    <h2 class="mb-6 text-2xl font-bold">
+        {{ 'Editar cliente' if cliente else 'Registrar cliente' }}
+    </h2>
+
+    <form method="POST" class="space-y-5">
+        <div>
+            <label for="nombre" class="mb-2 block font-medium">Nombre completo *</label>
+            <input id="nombre" name="nombre" required maxlength="100"
+                   value="{{ request.form.get('nombre', cliente.nombre if cliente else '') }}"
+                   class="w-full rounded-lg border border-slate-300 px-4 py-3"
+                   placeholder="Ej. María López">
+        </div>
+
+        <div>
+            <label for="correo" class="mb-2 block font-medium">Correo electrónico *</label>
+            <input id="correo" name="correo" type="email" required maxlength="120"
+                   value="{{ request.form.get('correo', cliente.correo if cliente else '') }}"
+                   class="w-full rounded-lg border border-slate-300 px-4 py-3"
+                   placeholder="maria@ejemplo.com">
+        </div>
+
+        <div>
+            <label for="telefono" class="mb-2 block font-medium">Teléfono</label>
+            <input id="telefono" name="telefono" maxlength="20"
+                   value="{{ request.form.get('telefono', cliente.telefono if cliente else '') }}"
+                   class="w-full rounded-lg border border-slate-300 px-4 py-3"
+                   placeholder="999 999 999">
+        </div>
+
+        <div class="flex flex-wrap gap-3 pt-2">
+            <button type="submit"
+                    class="rounded-lg bg-blue-700 px-5 py-3 font-semibold text-white hover:bg-blue-800">
+                Guardar cliente
+            </button>
+            <a href="{{ url_for('clientes.index') }}"
+               class="rounded-lg bg-slate-200 px-5 py-3 font-semibold hover:bg-slate-300">
+                Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

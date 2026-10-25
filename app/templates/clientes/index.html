@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Clientes | Gestión de Clientes{% endblock %}
+
+{% block content %}
+<div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+    <div>
+        <h2 class="text-2xl font-bold">Directorio de clientes</h2>
+        <p class="mt-1 text-slate-500">Administra los registros del sistema.</p>
+    </div>
+    <a href="{{ url_for('clientes.nuevo') }}"
+       class="rounded-lg bg-blue-700 px-5 py-3 font-semibold text-white hover:bg-blue-800">
+        + Nuevo cliente
+    </a>
+</div>
+
+<div class="overflow-x-auto rounded-xl bg-white shadow">
+    <table class="w-full text-left text-sm">
+        <thead class="bg-slate-200 text-slate-700">
+            <tr>
+                <th class="p-4">ID</th>
+                <th class="p-4">Nombre</th>
+                <th class="p-4">Correo</th>
+                <th class="p-4">Teléfono</th>
+                <th class="p-4">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for cliente in clientes %}
+            <tr class="border-t hover:bg-slate-50">
+                <td class="p-4">{{ cliente.id }}</td>
+                <td class="p-4 font-medium">{{ cliente.nombre }}</td>
+                <td class="p-4">{{ cliente.correo }}</td>
+                <td class="p-4">{{ cliente.telefono or '—' }}</td>
+                <td class="p-4">
+                    <div class="flex flex-wrap gap-3">
+                        <a class="font-semibold text-blue-700"
+                           href="{{ url_for('clientes.editar', cliente_id=cliente.id) }}">
+                            Editar
+                        </a>
+                        <form method="POST"
+                              action="{{ url_for('clientes.eliminar', cliente_id=cliente.id) }}"
+                              onsubmit="return confirm('¿Eliminar este cliente?')">
+                            <button class="font-semibold text-red-600" type="submit">
+                                Eliminar
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5" class="p-8 text-center text-slate-500">
+                    No hay clientes registrados. Crea el primero.
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
