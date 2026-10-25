@@ -1,13 +1,38 @@
-from sqlalchemy import select
+
+from sqlalchemy import func, or_, select
 from sqlalchemy.exc import IntegrityError
+
 from app.database import db
 from app.models.cliente import Cliente
 
 
-def listar_clientes():
-    return db.session.execute(
-        select(Cliente).order_by(Cliente.id.desc())
-    ).scalars().all()
+def listar_clientes(busqueda="", page=1, per_page=10):
+    consulta = select(Cliente)
+
+    if busqueda:
+        patron = f"%{busqueda}%"
+        consulta = consulta.where(
+            or_(
+                Cliente.nombre.ilike(patron),
+                Cliente.correo.ilike(patron),
+                Cliente.telefono.ilike(patron),
+            )
+        )
+
+    consulta = consulta.order_by(Cliente.id.desc())
+
+    return db.paginate(
+        consulta,
+        page=page,
+        per_page=per_page,
+        max_per_page=50,
+        error_out=False,
+    )
+
+
+def contar_clientes():
+    consulta = select(func.count()).select_from(Cliente)
+    return db.session.scalar(consulta) or 0
 
 
 def obtener_cliente(cliente_id):
@@ -20,6 +45,7 @@ def crear_cliente(nombre, correo, telefono):
         correo=correo.strip().lower(),
         telefono=telefono.strip() or None,
     )
+
     db.session.add(cliente)
 
     try:
